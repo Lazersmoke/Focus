@@ -1,13 +1,11 @@
 {-# LANGUAGE TypeFamilies, MultiParamTypeClasses, FlexibleInstances, FlexibleContexts #-}
 module Data.Focus where
 
-class Focus w a where
-  type Focused w a :: *
-  focus :: a -> w -> Focused w a
-  tinker :: a -> (Focused w a -> Focused w a) -> w -> w
+class Focus whole part spec where
+  focus :: spec -> whole -> part
+  tinker :: spec -> (part -> part) -> whole -> whole
 
 data ExplicitFocus w p = ExplicitFocus (w -> p) ((p -> p) -> w -> w)
-instance Focus w (ExplicitFocus w p) where
-  type Focused w (ExplicitFocus w p) = p
+instance Focus w p (ExplicitFocus w p) where
   focus (ExplicitFocus f _) = f
   tinker (ExplicitFocus _ t) = t
